@@ -11,7 +11,7 @@ app = Flask(__name__)
 # sample hello world page
 @app.route('/')
 def hello():
-    return "<h1>Hello World</h1>"
+    return "<h1>python api</h1>"
 
 
 # sample api endpoint
