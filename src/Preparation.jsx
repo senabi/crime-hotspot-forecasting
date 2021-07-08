@@ -43,7 +43,7 @@ function Preparation() {
                         RandomMethod();
                     }}
                 >
-                    Gen. Random
+                    Gen. Cluster
                 </Button>
                 <Button
                     variant="outlined"

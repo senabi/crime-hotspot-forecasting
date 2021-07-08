@@ -9,6 +9,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 
+import useFetch from "./useFetch";
+
 const useStyles = makeStyles({
     table: {
         minWidth: 650,
@@ -27,15 +29,25 @@ const rows = [
     createData("Gingerbread", 356, 16.0, 49, 3.9, 1, 1, 1),
 ];
 
+const cols = ["name", "calories", "fat", "carbs", "protein", "e1", "e2", "e3"];
+
 function PreAnalysis() {
     const classes = useStyles();
     // Create the count state.
     const [count, setCount] = useState(0);
+    const [column, setColumn] = useState(null);
     // Update the count (+1 every second).
     useEffect(() => {
         const timer = setTimeout(() => setCount(count + 1), 1000);
         return () => clearTimeout(timer);
     }, [count, setCount]);
+
+    const {
+        data: dataHead,
+        isPending: dataHeadIsPending,
+        error: dataError,
+    } = useFetch("http://localhost:5002/get_data_head");
+
     // Return the App component.
     return (
         <React.Fragment>
@@ -44,6 +56,9 @@ function PreAnalysis() {
                 seconds.
             </p>
             <div>Head:</div>
+            {dataError && <div> {dataError} </div>}
+            {dataHeadIsPending && <div>Data Head Loading...</div>}
+            {dataHead && <div>Data Loaded</div>}
             <TableContainer component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                     <TableHead>
