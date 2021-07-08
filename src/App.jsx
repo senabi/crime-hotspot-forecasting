@@ -1,22 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import Navbar from "./Navbar";
+import Home from "./Home";
+import PreAnalysis from "./PreAnalysis";
+import Preparation from "./Preparation";
+import Exploration from "./Exploration";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import NotFound from "./NotFound";
+import { Box, Button } from "@material-ui/core";
 
 function App() {
-    // Create the count state.
-    const [count, setCount] = useState(0);
-    // Update the count (+1 every second).
-    useEffect(() => {
-        const timer = setTimeout(() => setCount(count + 1), 1000);
-        return () => clearTimeout(timer);
-    }, [count, setCount]);
-    // Return the App component.
     return (
-        <div className="App">
-            <header className="App-header">
-                <p>
-                    Page has been open for <code>{count}</code> seconds.
-                </p>
-            </header>
-        </div>
+        <Router>
+            <div className="App">
+                <Navbar />
+                <Box m={2} pt={3}>
+                    <Button color="default"></Button>
+                </Box>
+                <Switch>
+                    <Route exact path="/" component={Home} />
+                    <Route path="/preanalysis" component={PreAnalysis} />
+                    <Route path="/preparation" component={Preparation} />
+                    <Route path="/exploration" component={Exploration} />
+                    <Route path="*" component={NotFound} />
+                </Switch>
+            </div>
+        </Router>
     );
 }
 
