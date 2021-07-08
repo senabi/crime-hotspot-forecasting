@@ -12,7 +12,7 @@ function CsvDataframe() {
             <div>Head: </div>
             {dfError && <div> {dfError} </div>}
             {dfIsPending && <div> Loading...</div>}
-            {df && <DataGridVirt header={df} />}
+            {df && <DataGridVirt df={df} />}
         </React.Fragment>
     );
 }

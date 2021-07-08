@@ -46,11 +46,12 @@ const DataGridVirt = ({ df }) => {
     //const data = useData(5, 3);
     //console.log(data);
 
-    return (
-        <div style={{ height: 400, width: "100%" }}>
-            <DataGrid {...data} columnBuffer={2} />
-        </div>
-    );
+    //return (
+    //<div style={{ height: 400, width: "100%" }}>
+    //<DataGrid {...data} columnBuffer={2} />
+    //</div>
+    //);
+    return <div />;
 };
 
 export default DataGridVirt;
