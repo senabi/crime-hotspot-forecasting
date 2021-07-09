@@ -35,7 +35,7 @@ function Preparation() {
 
     async function sendReq() {
         const abortCont = new AbortController();
-        await fetch("http://localhost:5002/corregir", {
+        await fetch("http://localhost:5000/corregir", {
             signal: abortCont.signal,
         })
             .then((res) => {

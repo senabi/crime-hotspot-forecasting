@@ -7,14 +7,14 @@ import { Container, Typography } from "@material-ui/core";
 
 function CsvDataframe() {
     const { data: df, isPending: dfIsPending, error: dfError } = useFetch(
-        "http://localhost:5002/get_dataset_header"
+        "http://localhost:5000/get_dataset_header"
     );
 
     const {
         data: metaData,
         isPending: metaIsPending,
         error: metaError,
-    } = useFetch("http://localhost:5002/get_metadata");
+    } = useFetch("http://localhost:5000/get_metadata");
 
     return (
         <React.Fragment>
