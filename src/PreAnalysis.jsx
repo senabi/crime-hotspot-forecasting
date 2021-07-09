@@ -19,8 +19,6 @@ function PreAnalysis() {
                 seconds.
             </p>
             <CsvDataframe />
-            <br />
-            <div>Descripción:</div>
         </React.Fragment>
     );
 }

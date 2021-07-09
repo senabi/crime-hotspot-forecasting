@@ -1,10 +1,9 @@
 import React from "react";
 import useFetch from "./useFetch";
 import DataGridVirt from "./DataGridVirt";
-
-const meta = ({ metaData }) => {
-    return <React.Fragment>{JSON.stringify(metaData)}</React.Fragment>;
-};
+import MetaColumnList from "./MetaColumnList";
+import MetadataCard from "./MetadataCard";
+import { Container, Typography } from "@material-ui/core";
 
 function CsvDataframe() {
     const { data: df, isPending: dfIsPending, error: dfError } = useFetch(
@@ -19,14 +18,46 @@ function CsvDataframe() {
 
     return (
         <React.Fragment>
-            <div>Head: </div>
+            <Container style={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h4" component="h2">
+                    Head
+                </Typography>
+            </Container>
             {dfError && <div> {dfError} </div>}
             {dfIsPending && <div> Loading...</div>}
-            {df && <DataGridVirt df={df} />}
-            <div>Metadata: </div>
+            {df && (
+                <Container>
+                    <DataGridVirt df={df} />{" "}
+                </Container>
+            )}
+            <br />
+            <Container style={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h4" component="h2">
+                    Chicago Crime Dataset Metadata{" "}
+                </Typography>
+            </Container>
             {metaError && <div> {metaError} </div>}
             {metaIsPending && <div> Loading... </div>}
-            {metaData && meta({ metaData })}
+            {metaData && (
+                <Container
+                    style={{ display: "flex", justifyContent: "center" }}
+                >
+                    <MetadataCard metadata={metaData.metadata} />
+                </Container>
+            )}
+            <br />
+            <Container style={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h4" component="h2">
+                    Columnas{" "}
+                </Typography>
+            </Container>
+            {metaError && <div> {metaError} </div>}
+            {metaIsPending && <div> Loading... </div>}
+            {metaData && (
+                <Container>
+                    <MetaColumnList columns={metaData.columns} />
+                </Container>
+            )}
         </React.Fragment>
     );
 }
