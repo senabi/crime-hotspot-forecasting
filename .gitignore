@@ -3,3 +3,5 @@ build
 node_modules
 python_pkgs
 app/Crimes.csv
+yarn.lock
+yarn-error.log

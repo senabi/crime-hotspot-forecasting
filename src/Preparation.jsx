@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
+import { Button, Container, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -12,17 +12,48 @@ const useStyles = makeStyles((theme) => ({
 
 function Preparation() {
     const classes = useStyles();
-    // Create the count state.
-    const [count, setCount] = useState(0);
-    // Update the count (+1 every second).
+    const [isSending, setIsSending] = useState("idle");
+    const isMounted = useRef(true);
     useEffect(() => {
-        const timer = setTimeout(() => setCount(count + 1), 1000);
-        return () => clearTimeout(timer);
-    }, [count, setCount]);
-    // Return the App component.
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
 
-    function RandomMethod() {
-        console.log("requesting...");
+    const kmeansRequest = useCallback(async () => {
+        // don't send again while we are sending
+        if (isSending === "requesting...") return;
+        // update state
+        setIsSending("requesting...");
+        // send the actual request
+        await sendReq();
+        // once the request is sent, update state again
+        if (isMounted.current)
+            // only update if we are still mounted
+            setIsSending("done");
+    }, [isSending]);
+
+    async function sendReq() {
+        const abortCont = new AbortController();
+        await fetch("http://localhost:5002/corregir", {
+            signal: abortCont.signal,
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    // error coming back from server
+                    throw Error("could not fetch the data for that resource");
+                }
+                console.log(res);
+                return res.json();
+            })
+            .catch((err) => {
+                if (err.name === "AbortError") {
+                    console.log("fetch aborted");
+                } else {
+                    // auto catches network / connection error
+                    console.log(err);
+                }
+            });
     }
 
     function GeocodeMethod() {
@@ -31,31 +62,41 @@ function Preparation() {
 
     return (
         <React.Fragment>
-            <p>
-                Preparation Page has been open for <code>{count}</code> seconds.
-            </p>
-            <div className={classes.root}>
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => {
-                        console.log("Generate Random");
-                        RandomMethod();
-                    }}
-                >
-                    Gen. Cluster
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => {
-                        console.log("Generate using geocode");
-                        GeocodeMethod();
-                    }}
-                >
-                    Gen. Geocode
-                </Button>
-            </div>
+            <Container style={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h4" component="h2">
+                    Generar Datos
+                </Typography>
+            </Container>
+            <br />
+            <Container style={{ display: "flex", justifyContent: "center" }}>
+                <div className={classes.root}>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => {
+                            console.log("Generate with kmeans");
+                            kmeansRequest();
+                        }}
+                    >
+                        Gen. Cluster
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => {
+                            console.log("Generate using geocode");
+                            GeocodeMethod();
+                        }}
+                    >
+                        Gen. Geocode
+                    </Button>
+                </div>
+            </Container>
+            <Container style={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h6" component="h2">
+                    Request: {isSending}
+                </Typography>
+            </Container>
         </React.Fragment>
     );
 }
