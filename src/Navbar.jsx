@@ -4,7 +4,6 @@ import {
     Typography,
     makeStyles,
     Button,
-    CssBaseline,
 } from "@material-ui/core";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
@@ -72,9 +71,7 @@ export default function Navbar() {
 
     return (
         <React.Fragment>
-            <CssBaseline>
-                <AppBar className={header}>{displayDesktop()}</AppBar>
-            </CssBaseline>
+            <AppBar className={header}>{displayDesktop()}</AppBar>
         </React.Fragment>
     );
 }

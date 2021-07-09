@@ -111,8 +111,8 @@ const palette = {
 };
 
 const theme = createTheme({
+    //palette: palette,
     palette: palette,
-
     typography: {
         fontFamily: `"Product Sans", "Helvetica", "Arial", sans-serif`,
         fontSize: 14,
