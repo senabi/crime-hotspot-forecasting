@@ -18,12 +18,7 @@ function PreAnalysis() {
                 Pre-Analysis Page has been open for <code>{count}</code>{" "}
                 seconds.
             </p>
-            <div>Head:</div>
             <CsvDataframe />
-            <br />
-            <div>Seleccionar atributo:</div>
-            <br />
-            <div>Descripción:</div>
         </React.Fragment>
     );
 }
