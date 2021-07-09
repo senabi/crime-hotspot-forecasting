@@ -20,8 +20,6 @@ function PreAnalysis() {
             </p>
             <CsvDataframe />
             <br />
-            <div>Metadata:</div>
-            <br />
             <div>Descripción:</div>
         </React.Fragment>
     );
