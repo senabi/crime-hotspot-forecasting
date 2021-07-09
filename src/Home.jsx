@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@material-ui/core";
-import DataGridVirt from "./DataGridVirt";
-import CsvDataframe from "./Csv-df";
 
 function Home() {
     // Create the count state.
@@ -18,7 +16,6 @@ function Home() {
                 Home Page has been open for <code>{count}</code> seconds.
             </p>
             <Card>hola</Card>
-            <CsvDataframe />
         </React.Fragment>
     );
 }

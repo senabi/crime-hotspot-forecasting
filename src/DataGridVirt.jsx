@@ -1,57 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataGrid } from "@material-ui/data-grid";
 
-//function useData(rowLength, columnLength) {
-//const [data, setData] = useState({ columns: [], rows: [] });
+function useData(df) {
+    const [data, setData] = useState({ columns: [], rows: [] });
 
-//React.useEffect(() => {
-//const rows = [];
+    useEffect(() => {
+        const rows = [];
+        const columns = [];
+        //const columns = [{ field: "id", hide: true }];
+        const headerNames = Object.keys(df[0]);
+        //setting column header names
+        headerNames.forEach((it, _) => {
+            if (it === "ID") {
+                columns.push({ field: "id", headerName: it, width: 150 });
+            } else {
+                columns.push({ field: it, headerName: it, width: 150 });
+            }
+        });
+        df.forEach((it, _) => {
+            const Obj = new Object();
+            for (const [key, value] of Object.entries(it)) {
+                if (key === "ID") {
+                    Obj["id"] = value;
+                } else {
+                    Obj[key] = value;
+                }
+            }
+            rows.push(Obj);
+        });
 
-//for (let i = 0; i < rowLength; i += 1) {
-//const row = {
-//id: i,
-//};
-//for (let j = 1; j <= columnLength; j += 1) {
-//row[`price${j}M`] = `${i.toString()}, ${j} `;
-//}
-//rows.push(row);
-//}
-
-//const columns = [{ field: "id", hide: true }];
-
-//for (let j = 1; j <= columnLength; j += 1) {
-//columns.push({ field: `price${j}M`, headerName: `${j}M` });
-//}
-
-//setData({
-//rows,
-//columns,
-//});
-////console.log(data);
-//}, [rowLength, columnLength]);
-
-//return data;
-//}
-//
-//
-
-const columns = [
-    { field: "id", headerName: "ID", width: 90 },
-    { field: "first", headerName: "firts" },
-];
-const rows = [{}, {}];
+        setData({
+            rows,
+            columns,
+        });
+        console.log(data);
+        return () => console.log("unmounting...");
+    }, []);
+    return data;
+}
 
 const DataGridVirt = ({ df }) => {
-    const data = [columns, rows];
-    //const data = useData(5, 3);
-    //console.log(data);
-
-    //return (
-    //<div style={{ height: 400, width: "100%" }}>
-    //<DataGrid {...data} columnBuffer={2} />
-    //</div>
-    //);
-    return <div />;
+    const data = useData(df);
+    return (
+        <div style={{ height: 400, width: "100%", color: "white" }}>
+            <DataGrid disableSelectionOnClick {...data} columnBuffer={2} />
+        </div>
+    );
 };
 
 export default DataGridVirt;
