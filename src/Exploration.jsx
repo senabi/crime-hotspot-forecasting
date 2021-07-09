@@ -8,6 +8,7 @@ import { CrimeTypeContext } from "./context/CrimeTypeContext";
 
 function Exploration() {
   const [crimeType, setCrimeType] = useState("ALL");
+  const [crimeColor, setCrimeColor] = useState("grey");
 
   const {
     data: pieData,
@@ -29,7 +30,9 @@ function Exploration() {
   } = useFetch("http://localhost:5000/coords/crime_type");
   // Return the App component.
   return (
-    <CrimeTypeContext.Provider value={{ crimeType, setCrimeType }}>
+    <CrimeTypeContext.Provider
+      value={{ crimeType, setCrimeType, crimeColor, setCrimeColor }}
+    >
       <React.Fragment>
         <div>Pie Chart: </div>
         {pieError && <div> {pieError} </div>}
