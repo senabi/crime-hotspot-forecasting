@@ -14,7 +14,7 @@ const MapChart = ({ data, points }) => {
     const height = 550;
     const width = 630;
     const projection = geoMercator()
-      .scale(width * 80)
+      .scale(width * 130)
       .center([-87.6298, 41.8781])
       .translate([width / 2, height / 2.5]);
     const pathGenerator = geoPath().projection(projection);
@@ -56,7 +56,7 @@ const MapChart = ({ data, points }) => {
       .style("fill", "green");
   }, [data, crimeType]);
 
-  return <svg ref={svgRef} width="630" height="550"></svg>;
+  return <svg ref={svgRef} width="10000" height="10000"></svg>;
 };
 
 export default MapChart;
