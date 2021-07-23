@@ -1,0 +1,17 @@
+.time-slider {
+  background-color: snow;
+  border-radius: 25px;
+  grid-area: time-slider;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.time-slider div {
+  margin: 10px;
+}

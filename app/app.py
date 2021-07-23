@@ -10,6 +10,8 @@ from numpy.core.numeric import moveaxis
 import pandas as pd
 import numpy as np
 import json
+from datetime import datetime
+from flask import request
 
 # declare constants
 HOST = 'localhost'
@@ -22,9 +24,33 @@ CORS(app)
 test_data = []
 
 crimes_df = pd.read_csv("./Crimes.csv")
-crimes_df['Month'] = pd.DatetimeIndex(crimes_df['Date']).month
 crimes_sel = crimes_df[(crimes_df["X Coordinate"].notnull())
-                       & (crimes_df["Y Coordinate"].notnull())]
+                       & (crimes_df["Y Coordinate"].notnull())].copy()
+
+
+date_items = {
+    'Year': [],
+    'Month': [],
+    'Day': [],
+    'Hour': [],
+    'Timestamp': [],
+}
+
+date_list = []
+
+for d in crimes_sel.Date.to_list():
+    date_item = datetime.strptime(d, '%m/%d/%Y %I:%M:%S %p')
+    date_items['Year'].append(date_item.year)
+    date_items['Month'].append(date_item.month)
+    date_items['Day'].append(date_item.day)
+    date_items['Hour'].append(date_item.hour)
+    date_items['Timestamp'].append(date_item.timestamp())
+
+crimes_sel['Month'] = date_items['Month'].copy()
+crimes_sel['Day'] = date_items['Day'].copy()
+crimes_sel['Hour'] = date_items['Hour'].copy()
+crimes_sel['Timestamp'] = date_items['Timestamp'].copy()
+
 
 data = []
 class_labels = crimes_df['Primary Type'].unique()
@@ -44,6 +70,8 @@ def hello():
     return "<h1>python api</h1>"
 
 # sample api endpoint
+
+
 @app.route('/api/test', methods=['GET', 'POST'])
 def test():
     global test_data
@@ -82,9 +110,10 @@ def get_crime_recount_type_month():
                 obj[crime_type][month] = v
 
     for i, v in recount_month.items():
-        obj['ALL'][i] = v    
+        obj['ALL'][i] = v
 
     return jsonify(obj)
+
 
 @app.route('/coords/crime_type')
 def get_coords_by_crime_type():
@@ -110,11 +139,40 @@ def get_coords_by_crime_type():
             JSon1[class_labels[i]] = separado[i].values.tolist()
     return jsonify(JSon1)
 
+
+@app.route('/coords/crime_type2')
+def get_coords_by_crime_type2():
+    fromMonth = request.args.get("fromMonth")
+    fromDay = request.args.get("fromDay")
+    toMonth = request.args.get("toMonth")
+    toDay = request.args.get("toDay")
+
+    filtered = crimes_sel[(crimes_sel['Month'] >= int(fromMonth)) & (crimes_sel['Day'] >= int(fromDay)) & (
+        crimes_sel['Month'] <= int(toMonth)) & (crimes_sel['Day'] <= int(toDay))]
+    print(filtered.shape)
+
+    grouped = filtered.groupby("Primary Type")
+    class_labels = filtered['Primary Type'].unique()
+    data = {}
+    for crime_type in class_labels:
+        data[crime_type] = {}
+        data[crime_type]["color"] = "red"
+        data[crime_type]["longs"] = grouped.get_group(
+            crime_type).Longitude.to_list()
+        data[crime_type]["lats"] = grouped.get_group(
+            crime_type).Latitude.to_list()
+
+    print("From date and to date:")
+    print(fromMonth, fromDay, toMonth, toDay)
+    return data
+
+
 @app.route('/get_dataset_header')
 @cross_origin()
 def get_dataset_header():
     raw_json_data = crimes_df.head(10).to_json(orient='records')
     return raw_json_data
+
 
 @app.route('/get_metadata')
 @cross_origin()
@@ -167,6 +225,7 @@ def get_columns():
     }
     return jsonify(response)
 
+
 @app.route('/corregir')
 def correjir():
     n = 3
@@ -184,8 +243,6 @@ def correjir():
                 if (np.isnan(row['Longitude'])):
                     row['Latitude'] = centroids[random.randint(0, n - 1)][1]
     return jsonify({"response": "done"})
-
-
 
 
 if __name__ == '__main__':

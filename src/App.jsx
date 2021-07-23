@@ -4,6 +4,7 @@ import Home from "./Home";
 import PreAnalysis from "./PreAnalysis";
 import Preparation from "./Preparation";
 import Exploration from "./Exploration";
+import Testing from "./Pages/Testing/Testing";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NotFound from "./NotFound";
 import { Box, Button } from "@material-ui/core";
@@ -21,6 +22,7 @@ function App() {
                     <Route path="/preanalysis" component={PreAnalysis} />
                     <Route path="/preparation" component={Preparation} />
                     <Route path="/exploration" component={Exploration} />
+                    <Route path="/testing" component={Testing} />
                     <Route path="*" component={NotFound} />
                 </Switch>
             </div>
