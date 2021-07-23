@@ -12,6 +12,7 @@ import numpy as np
 import json
 from datetime import datetime
 from flask import request
+from random import randint
 
 # declare constants
 HOST = 'localhost'
@@ -153,10 +154,15 @@ def get_coords_by_crime_type2():
 
     grouped = filtered.groupby("Primary Type")
     class_labels = filtered['Primary Type'].unique()
+    colors = {}
+
+    for crime_type in class_labels:
+        colors[crime_type] = '#%06X' % randint(0, 0xFFFFFF)
+
     data = {}
     for crime_type in class_labels:
         data[crime_type] = {}
-        data[crime_type]["color"] = "red"
+        data[crime_type]["color"] = colors[crime_type]
         data[crime_type]["longs"] = grouped.get_group(
             crime_type).Longitude.to_list()
         data[crime_type]["lats"] = grouped.get_group(

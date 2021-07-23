@@ -33,7 +33,6 @@ const ScatterMap = () => {
           size: 10,
           color: pointsData[key]["color"],
         },
-        text: key,
       });
     });
   }
