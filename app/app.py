@@ -93,8 +93,8 @@ def get_crime_recount():
 
 @app.route('/get/crime_recount/type/month')
 def get_crime_recount_type_month():
-    recount = crimes_df.groupby(['Primary Type', 'Month']).count()['ID']
-    recount_month = crimes_df.groupby(['Month']).count()['ID']
+    recount = crimes_sel.groupby(['Primary Type', 'Month']).count()['ID']
+    recount_month = crimes_sel.groupby(['Month']).count()['ID']
 
     obj = {}
     obj['ALL'] = {}
@@ -168,8 +168,6 @@ def get_coords_by_crime_type2():
         data[crime_type]["lats"] = grouped.get_group(
             crime_type).Latitude.to_list()
 
-    print("From date and to date:")
-    print(fromMonth, fromDay, toMonth, toDay)
     return data
 
 
@@ -250,6 +248,23 @@ def correjir():
                     row['Latitude'] = centroids[random.randint(0, n - 1)][1]
     return jsonify({"response": "done"})
 
+@app.route('/hour/crimes')
+def get_hour_crimes():
+    months_prev_df = crimes_sel.groupby('Hour')['Primary Type'].value_counts().unstack().fillna(0)
+
+    colnames = months_prev_df.columns.to_list()
+    # using Months as str
+    #months_str = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    hour_str = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17','18','19','20','21','22','23']
+
+    cols_ = colnames.copy()
+    cols_.insert(0,'Hour')
+    months_prev_df = pd.DataFrame(np.hstack([pd.DataFrame(hour_str),months_prev_df]),columns=cols_)
+    months_df = dict()
+    for col in months_prev_df:
+        months_df[col] = months_prev_df[col].to_list()
+
+    return months_df
 
 if __name__ == '__main__':
     app.run(host=HOST, debug=True, port=PORT)
