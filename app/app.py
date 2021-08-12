@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import enum
 from flask import Flask, jsonify, render_template
 from flask_cors import CORS, cross_origin
 from sklearn.cluster import KMeans
@@ -13,6 +14,8 @@ import json
 from datetime import datetime
 from flask import request
 from random import randint
+from sklearn.neighbors import KernelDensity
+from sklearn.utils.extmath import density
 
 # declare constants
 HOST = 'localhost'
@@ -141,6 +144,167 @@ def get_coords_by_crime_type():
     return jsonify(JSon1)
 
 
+@app.route('/crime_types')
+def get_crime_types():
+    fromMonth = request.args.get("fromMonth")
+    fromDay = request.args.get("fromDay")
+    toMonth = request.args.get("toMonth")
+    toDay = request.args.get("toDay")
+
+    filtered = crimes_sel[(crimes_sel['Month'] >= int(fromMonth)) & (crimes_sel['Day'] >= int(fromDay)) & (
+        crimes_sel['Month'] <= int(toMonth)) & (crimes_sel['Day'] <= int(toDay))]
+
+    data = {}
+    data['crime_types'] = filtered['Primary Type'].unique().tolist()
+    return data
+
+@app.route('/map_crime_recount')
+def get_map_crime_recount():
+    temp_df = crimes_df.dropna()
+    no_wards = np.max(temp_df['Ward'].astype(int).values)
+    wards = np.linspace(1,no_wards,no_wards).astype(int).tolist()
+
+    ward_group = temp_df[temp_df['Primary Type']=="BATTERY"][['ID','Ward']].astype(int).groupby('Ward').count()
+
+    for ward in wards:
+        if not (ward in ward_group.index.values):
+            ward_group.loc[ward] = [0]
+    ward_group = ward_group.sort_index()
+
+    data = {}
+    location = []
+    for ward in ward_group.index.values:
+        location.append(str(ward))
+
+    data['location'] = location
+    data['count'] = ward_group['ID'].values.tolist()
+    return jsonify(data)
+
+@app.route('/kde_densities')
+def get_kde_densities():
+    fromMonth = request.args.get("fromMonth")
+    fromDay = request.args.get("fromDay")
+    toMonth = request.args.get("toMonth")
+    toDay = request.args.get("toDay")
+    crimeType = request.args.get("crimeType")
+    dimension = request.args.get("dimension")
+
+    filtered = crimes_sel[(crimes_sel['Month'] >= int(fromMonth)) & (crimes_sel['Day'] >= int(fromDay)) & (
+        crimes_sel['Month'] <= int(toMonth)) & (crimes_sel['Day'] <= int(toDay)) & (
+        crimes_sel['Primary Type'] == crimeType)]
+    print(filtered.shape)
+    if (crimeType == "-" or filtered.shape[0] <= 0):
+        return {'x': [], 'y': []}
+
+    datos = []
+    bw = 0
+
+    if(dimension == 'x'):
+        datos = filtered['Latitude'].values
+        bw = 0.01
+    elif(dimension == 'y'):
+        datos = filtered['Longitude'].values
+        bw = 0.01
+    elif(dimension == 't'):
+        datos = filtered['Timestamp'].values
+        datos = datos/(60*60*24)
+        bw = 3.0
+    else:
+        datos = filtered['Latitude'].values
+        bw = 0.01
+
+    min_val = np.min(datos)
+    max_val = np.max(datos)
+
+    grid_len = 200
+
+    modelo_kde = KernelDensity(kernel='epanechnikov', bandwidth=bw)
+    modelo_kde.fit(X=datos.reshape(-1, 1))
+
+    grid = np.linspace(min_val, max_val, grid_len)
+
+    log_density_pred = modelo_kde.score_samples(X=grid.reshape(-1, 1))
+    density_pred = np.exp(log_density_pred)
+
+    data = {}
+    data['x'] = grid.tolist()
+    data['y'] = density_pred.tolist()
+
+    return data
+
+
+@app.route('/heat_map_densities')
+def get_heat_map_densities():
+    fromMonth = request.args.get("fromMonth")
+    fromDay = request.args.get("fromDay")
+    toMonth = request.args.get("toMonth")
+    toDay = request.args.get("toDay")
+    crimeType = request.args.get("crimeType")
+    if (crimeType == "-"):
+        return {'x': [], 'y': [], 'z': []}
+
+    filtered = crimes_sel[(crimes_sel['Month'] >= int(fromMonth)) & (crimes_sel['Day'] >= int(fromDay)) & (
+        crimes_sel['Month'] <= int(toMonth)) & (crimes_sel['Day'] <= int(toDay)) & (
+        crimes_sel['Primary Type'] == crimeType)]
+
+    datosX = filtered['Latitude'].values
+    datosY = filtered['Longitude'].values
+
+    minX = np.min(datosX)
+    maxX = np.max(datosX)
+    minY = np.min(datosY)
+    maxY = np.max(datosY)
+
+    bw = 0.01
+    grid_len = 200
+
+    modelo_kdeX = KernelDensity(kernel='epanechnikov', bandwidth=bw)
+    modelo_kdeX.fit(X=datosX.reshape(-1, 1))
+
+    modelo_kdeY = KernelDensity(kernel='epanechnikov', bandwidth=bw)
+    modelo_kdeY.fit(X=datosY.reshape(-1, 1))
+
+    x_grid = np.linspace(minX, maxX, grid_len)
+    y_grid = np.linspace(minY, maxY, grid_len)
+
+    log_density_predX = modelo_kdeX.score_samples(X=x_grid.reshape(-1, 1))
+    density_predX = np.exp(log_density_predX)
+
+    log_density_predY = modelo_kdeY.score_samples(X=y_grid.reshape(-1, 1))
+    density_predY = np.exp(log_density_predY)
+
+    densities = []
+
+    for ix, x in enumerate(x_grid):
+        for iy, y in enumerate(y_grid):
+            densities.append(density_predX[ix]*density_predY[iy])
+
+    threshold = np.percentile(densities, 98)
+
+    x_p = []
+    y_p = []
+    z_p = []
+    for ix, x in enumerate(x_grid):
+        for iy, y in enumerate(y_grid):
+            density = density_predX[ix]*density_predY[iy]
+            if density < threshold:
+                continue
+            x_p.append(x)
+            y_p.append(y)
+            z_p.append(density)
+
+    z_p = np.array(z_p)
+
+    z_p = z_p / np.max(z_p)
+
+    data = {}
+    data['x'] = x_p
+    data['y'] = y_p
+    data['z'] = z_p.tolist()
+
+    return data
+
+
 @app.route('/coords/crime_type2')
 def get_coords_by_crime_type2():
     fromMonth = request.args.get("fromMonth")
@@ -248,23 +412,28 @@ def correjir():
                     row['Latitude'] = centroids[random.randint(0, n - 1)][1]
     return jsonify({"response": "done"})
 
+
 @app.route('/hour/crimes')
 def get_hour_crimes():
-    months_prev_df = crimes_sel.groupby('Hour')['Primary Type'].value_counts().unstack().fillna(0)
+    months_prev_df = crimes_sel.groupby(
+        'Hour')['Primary Type'].value_counts().unstack().fillna(0)
 
     colnames = months_prev_df.columns.to_list()
     # using Months as str
     #months_str = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    hour_str = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17','18','19','20','21','22','23']
+    hour_str = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
 
     cols_ = colnames.copy()
-    cols_.insert(0,'Hour')
-    months_prev_df = pd.DataFrame(np.hstack([pd.DataFrame(hour_str),months_prev_df]),columns=cols_)
+    cols_.insert(0, 'Hour')
+    months_prev_df = pd.DataFrame(
+        np.hstack([pd.DataFrame(hour_str), months_prev_df]), columns=cols_)
     months_df = dict()
     for col in months_prev_df:
         months_df[col] = months_prev_df[col].to_list()
 
     return months_df
+
 
 if __name__ == '__main__':
     app.run(host=HOST, debug=True, port=PORT)

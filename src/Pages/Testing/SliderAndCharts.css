@@ -1,0 +1,9 @@
+.slider-and-charts {
+    background-color: darkgrey;
+    grid-area: slider_and_charts;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 10px
+}

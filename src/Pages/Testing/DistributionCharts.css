@@ -1,4 +1,8 @@
 .distribution-charts {
   background-color: darkcyan;
   grid-area: charts;
+  display: grid;
+
+  grid-template: 1fr / 6.5fr 3.5fr;
+  grid-template-areas: "heatmap_and_bars slider_and_charts";
 }

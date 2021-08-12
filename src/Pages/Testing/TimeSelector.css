@@ -1,10 +1,10 @@
-.time-slider {
+.time-selector {
   background-color: snow;
   border-radius: 25px;
-  grid-area: time-slider;
   margin-left: 10px;
   margin-right: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
+  margin-top: 20px;
 
   display: flex;
   flex-flow: row wrap;
@@ -12,6 +12,7 @@
   align-items: center;
 }
 
-.time-slider div {
-  margin: 10px;
+.time-selector div {
+  margin-top: 0px;
+  margin-bottom: 10px;
 }

@@ -1,10 +1,12 @@
 .testing {
   background-color:silver;
-  width: 95vw;
-  height: 90vh;
+  width: 100vw;
+  height: 150vh;
   display: grid;
   /* gap: 10px; */
-  grid-template: 1fr / 4fr 6fr;
-  grid-template-areas: "map-time charts";
+  grid-template: 6fr 4fr / 3fr 7fr;
+  grid-template-areas: 
+  "map-time charts"
+  "freq-map xplot";
   /* border-radius: 25px; */
 }

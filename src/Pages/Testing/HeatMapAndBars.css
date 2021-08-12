@@ -1,0 +1,11 @@
+.heat-map-and-bars {
+  background-color: blueviolet;
+  grid-area: heatmap_and_bars;
+
+  display: grid;
+  gap: 10px;
+  grid-template: 65fr 35fr / 1fr;
+  grid-template-areas:
+    "heat-map"
+    "freq-bars";
+}

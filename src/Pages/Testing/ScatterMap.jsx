@@ -30,54 +30,30 @@ const ScatterMap = () => {
         lat: pointsData[key]["lats"],
         mode: "markers",
         marker: {
-          size: 10,
+          size: 5,
           color: pointsData[key]["color"],
         },
       });
     });
   }
 
-  /* var data = [
-    {
-      type: "scattermapbox",
-      name: "rojo",
-      lon: ["-87.6298", "-87.6299"],
-      lat: ["41.8781", "41.8782"],
-      mode: "markers",
-      marker: {
-        size: 14,
-        color: "red",
-      },
-      text: "Montreal",
-    },
-    {
-      type: "scattermapbox",
-      name: "azul",
-      lon: ["-87.6295", "-87.6294"],
-      lat: ["41.8784", "41.8783"],
-      mode: "markers",
-      marker: {
-        size: 14,
-        color: "blue",
-      },
-      text: "Montreal",
-    },
-  ]; */
-
   const layout = {
-    width: 560,
-    height: 490,
+    width: 610,
+    height: 900,
     hovermode: "closest",
     mapbox: {
       bearing: 0,
       center: {
         lon: -87.6298,
-        lat: 41.8781,
+        lat: 41.8380,
       },
       pitch: 0,
-      zoom: 10,
+      zoom: 9,
     },
     margin: { l: 0, r: 0, t: 0, b: 0 },
+    legend: {
+      
+    },
   };
 
   const config = {
