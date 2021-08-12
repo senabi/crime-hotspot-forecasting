@@ -164,7 +164,8 @@ def get_map_crime_recount():
     no_wards = np.max(temp_df['Ward'].astype(int).values)
     wards = np.linspace(1,no_wards,no_wards).astype(int).tolist()
 
-    ward_group = temp_df[temp_df['Primary Type']=="BATTERY"][['ID','Ward']].astype(int).groupby('Ward').count()
+    #ward_group = temp_df[temp_df['Primary Type']=="BATTERY"][['ID','Ward']].astype(int).groupby('Ward').count()
+    ward_group = temp_df[['ID','Ward']].astype(int).groupby('Ward').count()
 
     for ward in wards:
         if not (ward in ward_group.index.values):
