@@ -3,19 +3,12 @@
 import enum
 from flask import Flask, jsonify, render_template
 from flask_cors import CORS, cross_origin
-from sklearn.cluster import KMeans
 import random
-from datetime import datetime
-import csv
-from numpy.core.numeric import moveaxis
 import pandas as pd
 import numpy as np
 import json
-from datetime import datetime
 from flask import request
 from random import randint
-from sklearn.neighbors import KernelDensity
-from sklearn.utils.extmath import density
 
 # declare constants
 HOST = 'localhost'
